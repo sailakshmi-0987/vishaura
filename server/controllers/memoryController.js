@@ -49,3 +49,15 @@ res.status(500).json({error:error.message});
 }
 
 };
+export const getMemories = async (req, res) => {
+  try {
+    const memories = await Memory.find({
+      surprise: req.params.surpriseId
+    });
+
+    res.json(memories);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
