@@ -1,11 +1,24 @@
 import Surprise from "../models/Surprise.js";
 import { v4 as uuidv4 } from "uuid";
+import cloudinary from "../utils/cloudinary.js";
 
 export const createSurprise = async (req,res)=>{
 
 try{
 
-const {birthdayPerson,birthdayDate,coverImage,message} = req.body;
+const {birthdayPerson,birthdayDate,message,theme} = req.body;
+
+let coverImageUrl = "";
+
+if(req.file){
+
+const uploaded = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
+resource_type: 'auto'
+});
+
+coverImageUrl = uploaded.secure_url;
+
+}
 
 const unlockTime = new Date(birthdayDate);
 unlockTime.setHours(0,0,0,0);
@@ -18,8 +31,9 @@ birthdayPerson,
 birthdayDate,
 unlockTime,
 inviteCode,
-coverImage,
-message
+coverImage: coverImageUrl,
+message,
+theme
 });
 
 res.json(surprise);

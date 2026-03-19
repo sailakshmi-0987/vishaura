@@ -22,6 +22,12 @@ coverImage:{
 type:String,
 default:""
 },
+
+theme:{
+type:String,
+default:"Classic Birthday"
+},
+
 inviteCode:{
 type:String,
 unique:true

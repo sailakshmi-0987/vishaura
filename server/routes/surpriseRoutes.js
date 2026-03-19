@@ -10,9 +10,11 @@ checkUnlock,
 getByInviteCode
 } from "../controllers/surpriseController.js";
 
+import upload from "../middleware/uploadMiddleware.js";
+
 const router = express.Router();
 
-router.post("/create",protect,createSurprise);
+router.post("/create",protect,upload.single("coverImage"),createSurprise);
 
 router.get("/invite/:code",getByInviteCode);
 
