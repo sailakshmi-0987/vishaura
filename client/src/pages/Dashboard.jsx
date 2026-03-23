@@ -157,7 +157,7 @@ function Dashboard() {
                       {/* ACTIONS */}
                       <div className="flex gap-2">
                         <button
-                          onClick={() => navigate(`/surprise/${item._id}`)}
+                          onClick={() => window.open(`/surprise/${item._id}`, '_blank')}
                           className="bg-pink-600 text-white px-3 py-1 rounded-md text-sm w-full"
                         >
                           View

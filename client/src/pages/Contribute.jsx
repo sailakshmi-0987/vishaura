@@ -1,170 +1,118 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../services/api";
 
 function Contribute() {
-
   const { code } = useParams();
 
-  const [surprise, setSurprise] = useState(null);
+  const [file, setFile] = useState(null);
+  const [message, setMessage] = useState("");
+  const [heading, setHeading] = useState("");
+  const [ending, setEnding] = useState("");
+  const [type, setType] = useState("image");
 
-  const [form, setForm] = useState({
-    type: "letter",
-    message: "",
-    file: null
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
-
-  // fetch surprise
-  const fetchSurprise = async () => {
+  const handleSubmit = async () => {
     try {
-      const res = await API.get(`/surprise/invite/${code}`);
-      setSurprise(res.data);
-    } catch (err) {
-      setError("Invalid or expired link");
-    }
-  };
+      const formData = new FormData();
 
-  useEffect(() => {
-    if (code) {
-      fetchSurprise();
-    }
-  }, [code]);
+      formData.append("surprise", code);
+      formData.append("type", type);
 
-  // input change
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  // file change
-  const handleFile = (e) => {
-    setForm({
-      ...form,
-      file: e.target.files[0]
-    });
-  };
-
-  // submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      setLoading(true);
-      setError("");
-      setSuccess("");
-
-      const data = new FormData();
-
-      data.append("surprise", surprise._id);
-      data.append("type", form.type);
-      data.append("message", form.message);
-
-      if (form.file) {
-        data.append("file", form.file);
+      if (file) {
+        formData.append("file", file);
       }
 
-      await API.post("/memory/create", data);
+      formData.append("message", message);
+      formData.append("heading", heading);
+      formData.append("ending", ending);
 
-      // success message
-      setSuccess("Memory added successfully ❤️");
+      // ✅ FIXED ENDPOINT
+      await API.post("/memory/create", formData);
+
+      alert("Memory saved ❤️");
 
       // reset form
-      setForm({
-        type: "letter",
-        message: "",
-        file: null
-      });
-
-      window.scrollTo(0, 0);
+      setFile(null);
+      setMessage("");
+      setHeading("");
+      setEnding("");
 
     } catch (err) {
-      setError("Failed to upload memory");
-    } finally {
-      setLoading(false);
+      console.log("Error:", err);
+      alert("Failed to save memory ❌");
     }
   };
 
-  // loading state
-  if (!surprise && !error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
-  }
-
-  // error state
-  if (error && !surprise) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="p-6 max-w-xl mx-auto">
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
+      <h1 className="text-2xl font-semibold mb-4 text-center">
+        Add Memory 💖
+      </h1>
+
+      {/* TYPE SELECT */}
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value)}
+        className="border p-2 rounded mb-4 w-full"
       >
-        <h2 className="text-2xl font-semibold mb-2 text-center">
-          Add Memory 🎉
-        </h2>
+        <option value="image">Gallery Photo</option>
+        <option value="timeline-photo">Timeline Photo</option>
+        <option value="video">Video</option>
+        <option value="audio">Audio</option>
+        <option value="letter">Letter</option>
+      </select>
 
-        <p className="text-center text-gray-500 mb-4">
-          For <span className="font-medium">{surprise.birthdayPerson}</span>
-        </p>
-        {success && (
-          <p className="text-green-600 text-sm mb-3 text-center">
-            {success}
-          </p>
-        )}
-        {error && (
-          <p className="text-red-500 text-sm mb-3 text-center">
-            {error}
-          </p>
-        )}
-        <select
-          name="type"
-          className="w-full border p-3 mb-3 rounded-lg"
-          value={form.type}
-          onChange={handleChange}
-        >
-          <option value="letter">Letter</option>
-          <option value="image">Image</option>
-          <option value="video">Video</option>
-          <option value="audio">Audio</option>
-        </select>
-        <textarea
-          name="message"
-          placeholder="Write something special..."
-          className="w-full border p-3 mb-3 rounded-lg"
-          value={form.message}
-          onChange={handleChange}
+      {/* FILE INPUT */}
+      {type !== "letter" && (
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+          className="mb-4 w-full"
         />
-        {form.type !== "letter" && (
-          <input
-            type="file"
-            className="w-full mb-4"
-            onChange={handleFile}
-          />
-        )}
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
-        >
-          {loading ? "Uploading..." : "Submit Memory"}
-        </button>
+      )}
 
-      </form>
+      {/* MESSAGE */}
+      <textarea
+        placeholder={
+          type === "letter"
+            ? "Write a heartfelt letter..."
+            : "Write a caption..."
+        }
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="w-full border p-3 rounded mb-4"
+      />
+
+      {/* LETTER HEADING */}
+      {type === "letter" && (
+        <input
+          type="text"
+          placeholder="Letter heading (e.g., 'My Dearest Love')"
+          value={heading}
+          onChange={(e) => setHeading(e.target.value)}
+          className="w-full border p-3 rounded mb-4"
+        />
+      )}
+
+      {/* LETTER ENDING */}
+      {type === "letter" && (
+        <input
+          type="text"
+          placeholder="Letter ending (e.g., 'Forever Yours')"
+          value={ending}
+          onChange={(e) => setEnding(e.target.value)}
+          className="w-full border p-3 rounded mb-4"
+        />
+      )}
+
+      {/* SUBMIT BUTTON */}
+      <button
+        onClick={handleSubmit}
+        className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full w-full"
+      >
+        Submit 💌
+      </button>
 
     </div>
   );
