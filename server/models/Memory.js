@@ -10,7 +10,7 @@ required:true
 
 type:{
 type:String,
-enum:["image","video","audio","letter"],
+enum:["image","video","audio","letter","timeline-photo"],
 required:true
 },
 
@@ -19,6 +19,14 @@ type:String
 },
 
 message:{
+type:String
+},
+
+heading:{
+type:String
+},
+
+ending:{
 type:String
 },
 

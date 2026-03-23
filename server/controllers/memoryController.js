@@ -1,59 +1,83 @@
 import Memory from "../models/Memory.js";
+import cloudinary from "../utils/cloudinary.js";
+import Surprise from "../models/Surprise.js";
 
-export const createMemory = async (req,res)=>{
+export const createMemory = async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
 
-try{
+    const { surprise, type, message, heading, ending } = req.body;
 
-const {surprise,type,message} = req.body;
+    if (!type) {
+      return res.status(400).json({ error: "Type is required" });
+    }
 
-let fileUrl = "";
+    // 🔥 Debug inviteCode
+    console.log("Invite Code Received:", surprise);
 
-if(req.file){
+    const surpriseDoc = await Surprise.findOne({ inviteCode: surprise });
 
-const result = await cloudinary.uploader.upload_stream(
-{resource_type:"auto"},
-async (error,uploaded)=>{
-if(error) return res.status(500).json(error);
+    console.log("Found Surprise:", surpriseDoc);
 
-fileUrl = uploaded.secure_url;
+    if (!surpriseDoc) {
+      return res.status(400).json({ error: "Invalid invite code" });
+    }
 
-const memory = await Memory.create({
-surprise,
-type,
-fileUrl,
-message
-});
+    let fileUrl = "";
 
-res.json(memory);
-}
-);
+    if (req.file) {
+      const uploaded = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "auto" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
 
-result.end(req.file.buffer);
+      fileUrl = uploaded.secure_url;
+    }
 
-}else{
+    const memory = await Memory.create({
+      surprise: surpriseDoc._id,
+      type,
+      fileUrl,
+      message,
+      heading,
+      ending
+    });
 
-const memory = await Memory.create({
-surprise,
-type,
-message
-});
+    res.status(201).json(memory);
 
-res.json(memory);
-
-}
-
-}catch(error){
-
-res.status(500).json({error:error.message});
-
-}
-
+  } catch (error) {
+    console.log("🔥 FULL ERROR:", error); // 👈 THIS IS KEY
+    res.status(500).json({ error: error.message });
+  }
 };
+
 export const getMemories = async (req, res) => {
   try {
     const memories = await Memory.find({
       surprise: req.params.surpriseId
-    });
+    }).sort({ createdAt: -1 });
+
+    res.json(memories);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getMemoriesByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const memories = await Memory.find({
+      surprise: req.params.surpriseId,
+      type: type
+    }).sort({ createdAt: -1 });
 
     res.json(memories);
 
