@@ -79,7 +79,7 @@ export default function GalleryPage() {
             <span>Back</span>
           </button>
           <h1 className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
-            Photo Gallery 🖼️
+            Photo Gallery 💕
           </h1>
           <div className="w-20" />
         </div>

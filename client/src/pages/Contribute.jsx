@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../services/api";
@@ -16,7 +16,22 @@ function Contribute() {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
 
+  const [surprise, setSurprise] = useState(null); // ✅ NEW
+
   const fileInputRef = useRef(null);
+
+  // ✅ FETCH BIRTHDAY PERSON
+  useEffect(() => {
+    const fetchSurprise = async () => {
+      try {
+        const res = await API.get(`/surprise/code/${code}`);
+        setSurprise(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchSurprise();
+  }, [code]);
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -47,7 +62,6 @@ function Contribute() {
 
       setToast({ type: "success", text: "Memory saved ❤️" });
 
-      // ✅ RESET EVERYTHING
       setFile(null);
       setPreview(null);
       setMessage("");
@@ -70,16 +84,39 @@ function Contribute() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-purple-950 to-pink-950 px-4">
 
-      {/* CARD */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-xl shadow-2xl"
       >
 
-        <h1 className="text-3xl text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
-          Add Memory 💖
+        {/* ✅ TITLE WITH NAME */}
+        <h1 className="text-3xl text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
+          🎉 Memories for {surprise?.birthdayPerson || "Someone Special"}
         </h1>
+
+        <p className="text-center text-gray-400 mb-6 text-sm">
+          Help us make this birthday unforgettable 💖
+        </p>
+
+        {/* ✅ INSTRUCTIONS */}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 text-sm text-gray-300">
+          <h3 className="text-pink-400 font-semibold mb-2">
+            📌 Upload Guidelines
+          </h3>
+
+          <ul className="space-y-1 list-disc list-inside">
+            <li>📸 Images: under <b>5MB</b></li>
+            <li>🎬 Videos: under <b>10MB</b></li>
+            <li>🎧 Audio: under <b>5MB</b></li>
+            <li>⚡ Compress files for faster upload</li>
+            <li>📶 Use stable internet</li>
+          </ul>
+
+          <p className="text-xs text-gray-400 mt-3 italic">
+            💡 Short and meaningful memories are the best 💖
+          </p>
+        </div>
 
         {/* TYPE SELECT */}
         <select
@@ -105,11 +142,7 @@ function Contribute() {
             />
 
             {preview && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mb-4"
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4">
                 {(type === "image" || type === "timeline-photo") ? (
                   <img src={preview} className="rounded-lg w-full" />
                 ) : (
@@ -149,7 +182,7 @@ function Contribute() {
           </>
         )}
 
-        {/* SUBMIT BUTTON */}
+        {/* SUBMIT */}
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={handleSubmit}

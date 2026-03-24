@@ -117,7 +117,7 @@ export default function VideoPage() {
           </button>
 
           <h1 className="text-xl text-pink-300">
-            Video Surprise 🎬
+            Video Surprise ✨
           </h1>
 
           <div className="w-20" />
