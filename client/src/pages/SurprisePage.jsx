@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Lock, Unlock, Heart, Volume2, VolumeX } from "lucide-react";
 import API from "../services/api";
-
+import { motion } from "framer-motion";
 
 function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -233,9 +233,29 @@ function SurprisePage() {
     {/* CONTENT */}
     <div className="relative z-10 max-w-2xl px-6">
 
-      <h1 className="text-5xl font-bold tracking-tight">
-        Happiest Birthday Ever {surprise.birthdayPerson}💗
-      </h1>
+   
+
+<motion.h1
+  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+  animate={{ opacity: 1, y: 0, scale: 1 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+  className="text-4xl md:text-6xl font-extrabold text-center tracking-tight leading-tight"
+>
+  <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-300 bg-clip-text text-transparent animate-pulse">
+    Happiest Birthday Ever
+  </span>
+
+  <br />
+
+  <motion.span
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: 0.6 }}
+    className="block mt-3 text-pink-300"
+  >
+    {surprise.birthdayPerson} 💗
+  </motion.span>
+</motion.h1>
 
       <p className="mt-4 text-lg text-gray-200">
         {surprise.message}
