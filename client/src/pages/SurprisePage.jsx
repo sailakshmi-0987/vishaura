@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Lock, Unlock, Heart, Volume2, VolumeX } from "lucide-react";
 import API from "../services/api";
-import { motion } from "framer-motion";
+
 
 function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
