@@ -193,7 +193,7 @@ function Contribute() {
           disabled={loading}
           className="w-full py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold"
         >
-          {loading ? "Uploading video... please wait ⏳" : "Submit 💌"}
+          {loading ? "Uploading... please wait ⏳" : "Submit 💌"}
         </motion.button>
       </motion.div>
 
