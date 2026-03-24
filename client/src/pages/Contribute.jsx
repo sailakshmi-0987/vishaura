@@ -44,6 +44,10 @@ function Contribute() {
 
   const handleSubmit = async () => {
     try {
+      if (type === "video" && file && file.size > 15 * 1024 * 1024) {
+        setToast({ type: "error", text: "Video must be under 15MB ❌" });
+        return;
+      }
       setLoading(true);
 
       const formData = new FormData();
@@ -57,8 +61,8 @@ function Contribute() {
       formData.append("message", message);
       formData.append("heading", heading);
       formData.append("ending", ending);
-
-      await API.post("/memory/create", formData);
+      
+      await API.post("/memory/create", formData,{timeout:120000});
 
       setToast({ type: "success", text: "Memory saved ❤️" });
 
@@ -189,7 +193,7 @@ function Contribute() {
           disabled={loading}
           className="w-full py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold"
         >
-          {loading ? "Uploading..." : "Submit 💌"}
+          {loading ? "Uploading video... please wait ⏳" : "Submit 💌"}
         </motion.button>
       </motion.div>
 
