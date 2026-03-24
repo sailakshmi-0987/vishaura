@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Lock, Unlock, Heart, Volume2, VolumeX } from "lucide-react";
 import API from "../services/api";
 
+
 function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -75,10 +76,10 @@ function BackgroundMusic() {
         )}
       </motion.button>
 
-      <audio ref={audioRef} loop>
+      <audio ref={audioRef} loop preload="auto">
         {/* Add your music source here */}
         <source
-          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+          src="/music/birthday.mp3"
           type="audio/mpeg"
         />
       </audio>

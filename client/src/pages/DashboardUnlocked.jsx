@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { useNavigate, useParams } from "react-router";
-import { Clock, Mail, Image, Video, Sparkles } from "lucide-react";
+import { Clock, Mail, Image, Video, Sparkles,Music } from "lucide-react";
+import BackgroundMusic from "../components/BackgroundMusic";
 
 export default function DashboardUnlocked() {
   const navigate = useNavigate();
@@ -43,11 +44,21 @@ export default function DashboardUnlocked() {
       gradient: "from-fuchsia-500 to-violet-500",
       path: `/videos/${surpriseId}`,
     },
+      {
+    id: 5,
+    title: "Audio",
+    emoji: "🎧",
+    icon: Music,
+    description: "Voice notes & special songs",
+    gradient: "from-blue-500 to-purple-500",
+    path: `/audio/${surpriseId}`,
+  },
   ];
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-black via-purple-950 to-black">
       {/* Animated background elements */}
+      <BackgroundMusic />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{

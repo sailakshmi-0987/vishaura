@@ -12,6 +12,7 @@ import TimelinePage from "./pages/TimelinePage";
 import LettersPage from "./pages/LettersPage";
 import GalleryPage from "./pages/GalleryPage";
 import VideoPage from "./pages/VideoPage";
+import AudioPage from "./pages/AudioPage";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/letters/:surpriseId" element={<LettersPage />} />
         <Route path="/gallery/:surpriseId" element={<GalleryPage />} />
         <Route path="/videos/:surpriseId" element={<VideoPage />} />
+        <Route path="/audio/:surpriseId" element={<AudioPage />} />
         <Route path="/create" element={<CreateSurprise />} />
         <Route path="/contribute/:code" element={<Contribute />} />
         <Route path="/surprise/:id" element={<SurprisePage />} />

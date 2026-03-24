@@ -164,16 +164,28 @@ function Dashboard() {
                         </button>
 
                         <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(
-                              `${window.location.origin}/contribute/${item.inviteCode}`
-                            );
-                            alert("Link copied!");
-                          }}
-                          className="bg-gray-100 px-3 py-1 rounded-md text-sm"
-                        >
-                          Share
-                        </button>
+  onClick={() => {
+    const link = `${window.location.origin}/contribute/${item.inviteCode}`;
+    const text = `Join me in creating a birthday surprise! 🎉 ${link}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Birthday Surprise Invite",
+        text: text,
+        url: link,
+      });
+    } else {
+      // fallback to WhatsApp
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(text)}`,
+        "_blank"
+      );
+    }
+  }}
+  className="bg-gray-100 px-3 py-1 rounded-md text-sm"
+>
+  Share
+</button>
                       </div>
                     </div>
                   </motion.div>
