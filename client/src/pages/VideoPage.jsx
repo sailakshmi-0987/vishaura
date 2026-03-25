@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { Play, Pause, Volume2, VolumeX, ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, Heart } from "lucide-react";
 import API from "../services/api";
 
 export default function VideoPage() {
@@ -10,149 +9,118 @@ export default function VideoPage() {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [showMessage, setShowMessage] = useState(false);
   const [videoMemories, setVideoMemories] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0); // ✅ NEW
-  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showMessage, setShowMessage] = useState(false);
 
   const videoRef = useRef(null);
 
   useEffect(() => {
     const fetchMemories = async () => {
       try {
-        const response = await API.get(`/memory/${surpriseId}/video`);
-        setVideoMemories(response.data);
-      } catch (error) {
-        console.error("Error fetching memories:", error);
-      } finally {
-        setLoading(false);
+        const res = await API.get(`/memory/${surpriseId}/video`);
+        setVideoMemories(res.data);
+      } catch (err) {
+        console.error(err);
       }
     };
 
-    if (surpriseId) {
-      fetchMemories();
-    }
+    if (surpriseId) fetchMemories();
   }, [surpriseId]);
 
-  const currentVideo = videoMemories[currentIndex]; // ✅ FIXED
+  const currentVideo = videoMemories[currentIndex];
 
   const handlePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    if (!videoRef.current) return;
+
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
     }
+
+    setIsPlaying(!isPlaying);
   };
 
   const handleMuteToggle = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
+    if (!videoRef.current) return;
+
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
   };
 
-  // ✅ AUTO NEXT VIDEO
   const handleVideoEnd = () => {
     if (currentIndex < videoMemories.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
       setIsPlaying(false);
     } else {
-      setIsPlaying(false);
-      setShowConfetti(true);
       setShowMessage(true);
-      triggerConfetti();
     }
   };
 
-  const triggerConfetti = () => {
-    const duration = 5 * 1000;
-    const animationEnd = Date.now() + duration;
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) return clearInterval(interval);
-
-      if (window.confetti) {
-        window.confetti({
-          particleCount: 50,
-          spread: 360,
-          origin: { x: Math.random(), y: Math.random() - 0.2 },
-        });
-      }
-    }, 250);
-  };
-
-  // ✅ MANUAL NAVIGATION
   const handleNext = () => {
     if (currentIndex < videoMemories.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
       setIsPlaying(false);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex((prev) => prev - 1);
       setIsPlaying(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-pink-950 relative">
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-pink-950">
 
       {/* HEADER */}
-      <div className="sticky top-0 z-40 backdrop-blur-md bg-black/30 border-b border-white/10">
+      <div className="sticky top-0 z-40 bg-black/30 backdrop-blur-md border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <button
             onClick={() => navigate(`/dashboard-unlocked/${surpriseId}`)}
             className="flex items-center gap-2 text-gray-400 hover:text-white"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft size={20} />
             Back
           </button>
 
-          <h1 className="text-xl text-pink-300">
-            Video Surprise ✨
-          </h1>
+          <h1 className="text-pink-300 text-xl">Video Surprise ✨</h1>
 
           <div className="w-20" />
         </div>
       </div>
 
-      {/* CONTENT */}
+      {/* VIDEO SECTION */}
       <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
 
         {currentVideo ? (
-          <div className="relative max-w-4xl w-full aspect-video rounded-2xl overflow-hidden">
+          <div className="relative max-w-4xl w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10">
 
             {/* VIDEO */}
             <video
               key={currentVideo._id}
               ref={videoRef}
-              className="w-full h-full object-cover"
+              className="max-h-[75vh] w-auto object-contain rounded-xl"
               onEnded={handleVideoEnd}
               muted={isMuted}
             >
               <source src={currentVideo.fileUrl} type="video/mp4" />
             </video>
 
-            {/* PLAY BUTTON */}
+            {/* PLAY OVERLAY */}
             {!isPlaying && (
               <button
                 onClick={handlePlayPause}
-                className="absolute inset-0 flex items-center justify-center"
+                className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition"
               >
-                <Play className="w-16 h-16 text-white" />
+                <Play className="w-20 h-20 text-white drop-shadow-lg" />
               </button>
             )}
 
             {/* CONTROLS */}
-            <div className="absolute bottom-4 left-4 flex gap-4">
+            <div className="absolute bottom-4 left-4 flex gap-4 text-white">
               <button onClick={handlePlayPause}>
                 {isPlaying ? <Pause /> : <Play />}
               </button>
@@ -166,7 +134,7 @@ export default function VideoPage() {
           <p className="text-white">No videos found</p>
         )}
 
-        {/* NAVIGATION BUTTONS */}
+        {/* NAV BUTTONS */}
         <div className="flex gap-4 mt-6">
           <button
             onClick={handlePrev}
@@ -184,18 +152,14 @@ export default function VideoPage() {
             Next ➡
           </button>
         </div>
-
       </div>
 
       {/* FINAL MESSAGE */}
       {showMessage && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <h1 className="text-5xl text-pink-300">
-            Happy Birthday 🎉
-          </h1>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70">
+          <h1 className="text-5xl text-pink-300">Happy Birthday 🎉</h1>
         </div>
       )}
-
     </div>
   );
 }
